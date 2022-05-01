@@ -1,5 +1,5 @@
 // Login Data
-var twitch_channel_name = "Majijej"
+var twitch_channel_name = ""
 var streamlabs_token = ""
 var streamelements_token = ""
 var streamloots_token = ""
