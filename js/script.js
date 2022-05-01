@@ -23,12 +23,11 @@ const getNextTime = () => {
 
 let countdownUpdater = setInterval(() => {
     getNextTime();
-}, 100);
+}, 1);
 
 
 
 const addTime = async (time, s) => {
-    endingTime = timeFunc.addSeconds(time, s);
     let addedTime = document.createElement("p");
     addedTime.classList = "addedTime";
     addedTime.innerText = `+${s}s`;
@@ -38,9 +37,15 @@ const addTime = async (time, s) => {
     addedTime.style.left = `${randomInRange(35, 65)}%`;
     addedTime.style.top = `${randomInRange(15, 40)}%`;
     addedTime.style.opacity = "1";
-    await sleep(2500);
+	while(s > 0){
+        timeStep = s > 60 ? s/30 : 2
+        endingTime = timeFunc.addSeconds(time, timeStep)
+        await sleep(50);
+        s -= timeStep
+	}
+    await sleep(200);
     addedTime.style.opacity = "0";
-    await sleep(500);
+    await sleep(200);
     addedTime.remove();
 };
 
@@ -50,7 +55,7 @@ const testAddTime = (times, delay) => {
     let addTimeInterval = setInterval(async () => {
         if (times > 0) {
             await sleep(randomInRange(50, delay-50));
-            addTime(endingTime, 30);
+            addTime(endingTime, 6000);
             --times;
         }
         else {
