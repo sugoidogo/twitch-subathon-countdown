@@ -1,5 +1,8 @@
 // Happy Hour
-var happpy_hour = true //set to true or false, to enable/disable the happy hours function
+var happy_hour = true //set to true or false, to enable/disable the happy hours function
+
+// Bulk (if you want multiple subs to add to a big sum or each alone)
+var bulk_enabled = true;
 
 // Login Data
 var twitch_channel_name = ""

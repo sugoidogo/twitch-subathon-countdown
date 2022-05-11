@@ -78,7 +78,7 @@ Mousetrap.bind('ctrl+alt+p', function(e) {
 });
 
 Mousetrap.bind('ctrl+alt+h', async function(e){
-	if(happpy_hour == true && happy_hour_active == false){
+	if(happy_hour == true && happy_hour_active == false){
 		logMessage("Core","Happy Hour activated");
 		happy_hour_active = true;
 		document.getElementById("HappyHourText").innerHTML = "Happy Hour Activated!";
@@ -86,13 +86,12 @@ Mousetrap.bind('ctrl+alt+h', async function(e){
 		document.getElementById("HappyHourText").style.opacity = "1";
 		document.getElementById("HappyHourHTML").animate({top: [ "-200px", "-250px" ], easing: [ 'ease-in', 'ease-out' ],}, 500);
 		document.getElementById("HappyHourHTML").style.top = "-250px";
-		// document.getElementById("HappyHourText").style.visibility = "visible";
 		document.getElementById("container").style.backgroundImage = "-webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0,0, 0, .1) 66%, transparent 66%), -webkit-linear-gradient(top, rgba(255, 255, 255, .25), rgba(0, 0, 0, .25)), url(https://drive.google.com/uc?id=1oduFlPg84O1DliM5FsLvJJsnwZ4m1Vpm), -webkit-linear-gradient(left, #0074cc, #a700cc)";
 		await sleep(10000)
 		document.getElementById("HappyHourText").animate({opacity: [ 1, 0 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
 		document.getElementById("HappyHourText").style.opacity = "0";
 	}
-	else if(happpy_hour == true && happy_hour_active == true){
+	else if(happy_hour == true && happy_hour_active == true){
 		logMessage("Core", "Happy Hour deactivated")
 		happy_hour_active = false;
 		document.getElementById("HappyHourText").innerHTML = "Happy Hour Deactivated";
@@ -105,7 +104,7 @@ Mousetrap.bind('ctrl+alt+h', async function(e){
 		document.getElementById("HappyHourText").animate({opacity: [ 1, 0 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
 		document.getElementById("HappyHourText").style.opacity = "0";
 	}
-	else if(happpy_hour == false){
+	else if(happy_hour == false){
 		logMessage("Core", "Happy Hour is not available")
 		document.getElementById("HappyHourText").innerHTML = "Happy Hour error";
 		document.getElementById("HappyHourText").animate({opacity: [ 0, 1 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
@@ -153,9 +152,48 @@ let countdownUpdater = setInterval(() => {
 }, 1); 
 
 
+var firstSub = true;
+var endingTimeBeforeCounter;
+var addedTimeCounter;
+var timeoutID;
+
 const addTime = async (time, s) => {
+    if(!bulk_enabled) {
+        endingTimeBeforeCounter = time;
+        addedTimeCounter = s;
+        addTimeInternal();
+        return;
+    }
+    if(firstSub) {
+        firstSub = false;
+        endingTimeBeforeCounter = time;
+        addedTimeCounter = s;
+    } else {
+        addedTimeCounter += s;
+        window.clearTimeout(timeoutID);
+    }
+    timeoutID = window.setTimeout(addTimeInternal, 1000);
+};
+
+const addTimeInternal = async () => {
+    let time = endingTimeBeforeCounter;
+    let s = addedTimeCounter;
+    addedTimeCounter = 0;
+    firstSub = true;
+    
     let addedTime = document.createElement("p");
-    addedTime.classList = "addedTime";
+	if(happy_hour == true && happy_hour_active == true) {
+		addedTime.classList = "gold";
+	}
+	else if(happy_hour == true && happy_hour_active == false) {
+		addedTime.classList = "addedTime";
+	}
+	else if(happy_hour == false && happy_hour_active == true) {
+		addedTime.classList = "addedTime";
+	}
+	else if(happy_hour == false && happy_hour_active == false) {
+		addedTime.classList = "addedTime";
+	}
     addedTime.innerText = `+${s}s`;
     document.body.appendChild(addedTime);
     addedTime.style.display = "block";
@@ -163,17 +201,17 @@ const addTime = async (time, s) => {
     addedTime.style.left = `${randomInRange(35, 65)}%`;
     addedTime.style.top = `${randomInRange(15, 40)}%`;
     addedTime.style.opacity = "1";
-	while(s > 0){
+    while(s > 0){
         timeStep = s > 60 ? s/30 : 2
         endingTime = timeFunc.addSeconds(time, timeStep)
         await sleep(50);
         s -= timeStep
-	}
+    }
     await sleep(200);
     addedTime.style.opacity = "0";
     await sleep(200);
     addedTime.remove();
-};
+}
 
 const testAddTime = (times, delay, s) => {
 	let addTimeInterval = setInterval(async () => {

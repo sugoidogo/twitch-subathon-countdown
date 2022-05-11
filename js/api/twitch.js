@@ -12,7 +12,7 @@ if (twitch_channel_name !== "") {
 
     client.on('subscription', (channel, username, methods, message, userstate) => {
         if (!countdownEnded) {
-            if(happpy_hour == true && happy_hour_active == false){
+            if(happy_hour == true && happy_hour_active == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_sub_prime);
@@ -32,7 +32,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == true && happy_hour_active == true){
+            else if(happy_hour == true && happy_hour_active == true){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_sub_prime_happy);
@@ -52,7 +52,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == false){
+            else if(happy_hour == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_sub_prime);
@@ -80,7 +80,7 @@ if (twitch_channel_name !== "") {
 
     client.on('resub', (channel, username, months, message, userstate, methods) => {
         if (!countdownEnded) {
-            if(happpy_hour == true && happy_hour_active == false){
+            if(happy_hour == true && happy_hour_active == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_resub_prime);
@@ -100,7 +100,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == true && happy_hour_active == true){
+            else if(happy_hour == true && happy_hour_active == true){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_resub_prime_happy);
@@ -120,7 +120,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == false){
+            else if(happy_hour == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_resub_prime);
@@ -148,7 +148,7 @@ if (twitch_channel_name !== "") {
 
     client.on('subgift', (channel, username, months, recipient, methods, userstate) => {
         if (!countdownEnded) {
-            if(happpy_hour == true && happy_hour_active == false){
+            if(happy_hour == true && happy_hour_active == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_giftsub_prime);
@@ -168,7 +168,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == true && happy_hour_active == true){
+            else if(happy_hour == true && happy_hour_active == true){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_giftsub_prime_happy);
@@ -188,7 +188,7 @@ if (twitch_channel_name !== "") {
                         break;
                 }
             }
-            else if(happpy_hour == false){
+            else if(happy_hour == false){
                 switch (methods['plan']) {
                     case "Prime":
                         addTime(endingTime, seconds_added_per_giftsub_tier1);

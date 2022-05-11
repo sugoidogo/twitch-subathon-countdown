@@ -208,3 +208,22 @@ canvas {
     color:white;
     transition: top 1s ease-out, opacity .5s ease-out;
 }
+
+.gold {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    display: none;
+    z-index: 5;
+    font-weight: 400;
+    font-size: 3.25rem;
+    /*color: var(--background-color);*/
+    color:gold;
+    background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: top 1s ease-out, opacity .5s ease-out;
+    text-shadow:none !important;
+}
