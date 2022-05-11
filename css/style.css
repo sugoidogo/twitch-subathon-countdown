@@ -44,6 +44,38 @@ body {
     visibility: hidden;
 }
 
+#HappyHourText {
+    opacity: 0;
+    font-size: 2.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* #HappyHourDeactive {
+    visibility: hidden;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#HappyHourError {
+    visibility: hidden;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+} */
+
+#HappyHourHTML {
+    top:-200px;
+    position: relative;
+}
+
 #startPage {
     position: absolute;
     align-items: center;
