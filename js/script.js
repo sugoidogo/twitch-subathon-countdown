@@ -3,6 +3,8 @@ const timeText = document.getElementById("timeText");
 var initialHours;
 var initialMinutes;
 var initialSeconds;
+var paused = false;
+var happy_hour_active = false;
 
 var initialHoursLocal = window.localStorage.getItem('initialHours')
 if(initialHoursLocal !== null) {
@@ -47,6 +49,12 @@ resetBtn.addEventListener("click", function(){
 
 
 startBtn.addEventListener("click", function(){
+
+	if(paused == true){
+		initialHours = window.localStorage.getItem('initialHours')
+		initialMinutes = window.localStorage.getItem('initialMinutes')
+		initialSeconds = window.localStorage.getItem('initialSeconds')
+	}
 	
 	let timeNow = new Date(Date.now());
 	
@@ -56,7 +64,58 @@ startBtn.addEventListener("click", function(){
 	endingTime = timeFunc.addHours(timeNow, initialHours);
 	endingTime = timeFunc.addMinutes(timeNow, initialMinutes);
 	endingTime = timeFunc.addSeconds(timeNow, initialSeconds); 
+
+	paused = false;
 	
+});
+
+
+Mousetrap.bind('ctrl+alt+p', function(e) {
+	paused = true;
+	logMessage("Core", "Timer was paused");
+	document.getElementById("startPage").style.visibility = "visible";
+	document.getElementById("container").style.visibility = "hidden";
+});
+
+Mousetrap.bind('ctrl+alt+h', async function(e){
+	if(happpy_hour == true && happy_hour_active == false){
+		logMessage("Core","Happy Hour activated");
+		happy_hour_active = true;
+		document.getElementById("HappyHourText").innerHTML = "Happy Hour Activated!";
+		document.getElementById("HappyHourText").animate({opacity: [ 0, 1 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "1";
+		document.getElementById("HappyHourHTML").animate({top: [ "-200px", "-250px" ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourHTML").style.top = "-250px";
+		// document.getElementById("HappyHourText").style.visibility = "visible";
+		document.getElementById("container").style.backgroundImage = "-webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0,0, 0, .1) 66%, transparent 66%), -webkit-linear-gradient(top, rgba(255, 255, 255, .25), rgba(0, 0, 0, .25)), url(https://drive.google.com/uc?id=1oduFlPg84O1DliM5FsLvJJsnwZ4m1Vpm), -webkit-linear-gradient(left, #0074cc, #a700cc)";
+		await sleep(10000)
+		document.getElementById("HappyHourText").animate({opacity: [ 1, 0 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "0";
+	}
+	else if(happpy_hour == true && happy_hour_active == true){
+		logMessage("Core", "Happy Hour deactivated")
+		happy_hour_active = false;
+		document.getElementById("HappyHourText").innerHTML = "Happy Hour Deactivated";
+		document.getElementById("HappyHourText").animate({opacity: [ 0, 1 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "1";
+		document.getElementById("HappyHourHTML").animate({top: [ "-200px", "-250px" ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourHTML").style.top = "-250px";
+		document.getElementById("container").style.backgroundImage = "-webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0,0, 0, .1) 66%, transparent 66%), -webkit-linear-gradient(top, rgba(255, 255, 255, .25), rgba(0, 0, 0, .25)), -webkit-linear-gradient(left, #0074cc, #a700cc)";
+		await sleep(5000)
+		document.getElementById("HappyHourText").animate({opacity: [ 1, 0 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "0";
+	}
+	else if(happpy_hour == false){
+		logMessage("Core", "Happy Hour is not available")
+		document.getElementById("HappyHourText").innerHTML = "Happy Hour error";
+		document.getElementById("HappyHourText").animate({opacity: [ 0, 1 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "1";
+		document.getElementById("HappyHourHTML").animate({top: [ "-200px", "-250px" ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourHTML").style.top = "-250px";
+		await sleep(5000)
+		document.getElementById("HappyHourText").animate({opacity: [ 1, 0 ], easing: [ 'ease-in', 'ease-out' ],}, 500);
+		document.getElementById("HappyHourText").style.opacity = "0";
+	}
 });
 
 
@@ -80,9 +139,11 @@ const getNextTime = () => {
 		countdownEnded = true;
 		time = "00:00:00";
 	}
-	window.localStorage.setItem('initialHours', timeFunc.getHours(differenceTime));
-	window.localStorage.setItem('initialMinutes', timeFunc.getMinutes(differenceTime));
-	window.localStorage.setItem('initialSeconds', timeFunc.getSeconds(differenceTime));
+	if(paused == false){
+		window.localStorage.setItem('initialHours', timeFunc.getHours(differenceTime));
+		window.localStorage.setItem('initialMinutes', timeFunc.getMinutes(differenceTime));
+		window.localStorage.setItem('initialSeconds', timeFunc.getSeconds(differenceTime));
+	}
 	timeText.innerText = time;
 	
 };
