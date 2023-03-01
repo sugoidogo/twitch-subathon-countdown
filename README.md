@@ -1,4 +1,4 @@
-<h1 align="center">Twitch Subathon Countdown Template</h1>
+<h1 align="center">Improved Twitch Subathon Countdown</h1>
 <p align="center">This is a Twitch Subathon Countdown originally by JayexDesigns.</p>
 <p align="center">The CSS Code is updated by Johnnycyan. The JS Files are updated by leabdd to add functionalities.</p>
 <br/>
@@ -12,6 +12,7 @@
 <h2>Shortcuts</h2>
 <p>To pause the Timer: CTRL+ALT+P</p>
 <p>To enable/disable Happy Hour: CTRL+ALT+H</p>
+<p>Shortcuts can be changed in config.js</p>
 <br/>
 
 <h2>Preview</h2>
@@ -42,10 +43,15 @@
 <h3>Happy Hour</h3>
 <p>If this is true, you can turn enable Happy Hour with the Shortcut. If it is false, the feature is disabled and cant be enabled.</p>
 <p>You have to set the Happy Hour time values manually.</p>
+<p>If enabled it can randomly activate the Happy Hour. It will last for one hour, but can be turned off manually with the Shortkey.</p>
+<p>In the Config you can set a specific Date and Time. At that a Happy Hour will happen.</p>
 
 <h3>Bulk</h3>
 <p>This enables that multiple Subs get added to the timer at once.</p>
 <p>For Example when a user gifts 10 Subs.</p>
+
+<h3>Full control on what to use</h3>
+<p>You can enable and disable if you want to add time for Subscriptions, Bits, Donations or Chests.</p>
 
 <h3>Other Values</h3>
 <p>Change the other values to set the amount of seconds that will be added for the subscriptions, donations... And the minimum donation amounts to trigger the countdown increase.</p>
