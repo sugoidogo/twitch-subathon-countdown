@@ -230,18 +230,19 @@ var addedTimeCounter;
 var timeoutID;
 
 const addTime = async (time, s) => {
+    let addedTime = Math.floor(s);
     if(!bulk_enabled) {
         endingTimeBeforeCounter = time;
-        addedTimeCounter = s;
+        addedTimeCounter = addedTime;
         addTimeInternal();
         return;
     }
     if(firstSub) {
         firstSub = false;
         endingTimeBeforeCounter = time;
-        addedTimeCounter = s;
+        addedTimeCounter = addedTime;
     } else {
-        addedTimeCounter += s;
+        addedTimeCounter += addedTime;
         window.clearTimeout(timeoutID);
     }
     timeoutID = window.setTimeout(addTimeInternal, 1000);

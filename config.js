@@ -61,24 +61,16 @@ var seconds_added_per_chests = 30
 
 
 // General Twitch, Streamlabs And StreamElements Config for Happy Hour
-var seconds_added_per_sub_prime_happy = 85
-var seconds_added_per_sub_tier1_happy = 85
-var seconds_added_per_sub_tier2_happy = 300
-var seconds_added_per_sub_tier3_happy = 960
+var factor_t1 = 1.5
+var factor_t2 = 1.75
+var factor_t3 = 2.0
+var factor_bits = 1.5
+var factor_donations = 1.5
 
-var seconds_added_per_resub_prime_happy = 85
-var seconds_added_per_resub_tier1_happy = 85
-var seconds_added_per_resub_tier2_happy = 300
-var seconds_added_per_resub_tier3_happy = 960
 
-var seconds_added_per_giftsub_tier1_happy = 85
-var seconds_added_per_giftsub_tier2_happy = 300
-var seconds_added_per_giftsub_tier3_happy = 960
-
-var seconds_added_per_bits_happy = 60
-
-// Streamlabs And StreamElements Config
-var seconds_added_per_donation_happy = 60
-
-// Streamloots Config
-var seconds_added_per_chests_happy = 60
+// General Twitch, Streamlabs And StreamElements Config for Random Hour
+var range_t1 = [0.5, 2]
+var range_t2 = [1.0, 3]
+var range_t3 = [2.0, 5]
+var range_bits = [0.5, 2]
+var range_donations = [0.5, 2]
