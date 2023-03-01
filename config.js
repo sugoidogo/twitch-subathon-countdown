@@ -1,5 +1,6 @@
 // Happy Hour
 var happy_hour = true // set to true or false, to enable/disable the happy hours function
+var random_hour = true
 var randHappy = false // only works if happy_hour = true
 var scheduleHappy = false // only works if happy_hour = true
 
@@ -13,6 +14,7 @@ var bulk_enabled = false
 //Shortcuts
 var pauseShort = "ctrl+alt+p"
 var happyHourShort = "ctrl+alt+h"
+var randomHourShort = "ctrl+alt+r"
 
 // Login Data
 var twitch_channel_name = ""
