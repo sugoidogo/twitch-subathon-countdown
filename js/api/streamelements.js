@@ -35,11 +35,11 @@ if (streamelements_token !== "") {
         function onEvent(data) {
             logObject("StreamElements", data);
             if (!countdownEnded) {
-                let factor_t1_local = (happy_hour_active ? factor_t1 : 1) * (random_hour_active ? randomInRangeNoRounding(...range_t1): 1);
-                let factor_t2_local = (happy_hour_active ? factor_t2  : 1) * (random_hour_active ? randomInRangeNoRounding(...range_t2): 1);
-                let factor_t3_local = (happy_hour_active ? factor_t3 : 1) * (random_hour_active ? randomInRangeNoRounding(...range_t3): 1);
-                let factor_bits_local = (happy_hour_active ? factor_bits : 1) * (random_hour_active ? randomInRangeNoRounding(...range_bits): 1);
-                let factor_donations_local = (happy_hour_active ? factor_donations : 1) * (random_hour_active ? randomInRangeNoRounding(...range_donations): 1);
+                let factor_t1_local = (happy_hour_active ? factor_t1 : 1) * (random_hour_active ? randomBellSkew(...range_t1): 1);
+                let factor_t2_local = (happy_hour_active ? factor_t2  : 1) * (random_hour_active ? randomBellSkew(...range_t2): 1);
+                let factor_t3_local = (happy_hour_active ? factor_t3 : 1) * (random_hour_active ? randomBellSkew(...range_t3): 1);
+                let factor_bits_local = (happy_hour_active ? factor_bits : 1) * (random_hour_active ? randomBellSkew(...range_bits): 1);
+                let factor_donations_local = (happy_hour_active ? factor_donations : 1) * (random_hour_active ? randomBellSkew(...range_donations): 1);
 
                 if ((data['listener'] === "subscriber-latest") && subEnable) {
                     if (data['event']['gifted'] || data['event']['bulkGifted']) {

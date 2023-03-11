@@ -69,8 +69,9 @@ var factor_donations = 1.5
 
 
 // General Twitch, Streamlabs And StreamElements Config for Random Hour
-var range_t1 = [0.5, 2]
-var range_t2 = [1.0, 3]
-var range_t3 = [2.0, 5]
-var range_bits = [0.5, 2]
-var range_donations = [0.5, 2]
+// [min, max, skew]
+var range_t1 = [0.1, 3, 1]
+var range_t2 = [0.1, 3, 2]
+var range_t3 = [0.1, 3, 3]
+var range_bits = [0.1, 3, 1]
+var range_donations = [0.1, 3, 1]
