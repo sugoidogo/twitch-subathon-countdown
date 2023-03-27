@@ -1,6 +1,6 @@
 <h1 align="center">Improved Twitch Subathon Countdown</h1>
 <p align="center">This is a Twitch Subathon Countdown originally by JayexDesigns.</p>
-<p align="center">The CSS Code is updated by Johnnycyan. The JS Files are updated by leabdd to add functionalities.</p>
+<p align="center">The CSS Code is updated by Johnnycyan. The JS Files are updated by leabdd and danilotitato to add functionalities.</p>
 <br/>
 
 <h2>Description</h2>
@@ -12,6 +12,7 @@
 <h2>Shortcuts</h2>
 <p>To pause the Timer: CTRL+ALT+P</p>
 <p>To enable/disable Happy Hour: CTRL+ALT+H</p>
+<p>To enable/disable Random Hour: CTRL+ALT+R</p>
 <p>Shortcuts can be changed in config.js</p>
 <br/>
 
@@ -40,11 +41,12 @@
 <h3>Initial Time</h3>
 <p>You can set the initial time of the timer by setting the hours, minutes and seconds to be added when the timer is created.</p>
 
-<h3>Happy Hour</h3>
-<p>If this is true, you can turn enable Happy Hour with the Shortcut. If it is false, the feature is disabled and cant be enabled.</p>
+<h3>Random Happy Hour</h3>
+<p>If this is true, you can turn enable Happy or Random Hour with the Shortcut. If it is false, the feature is disabled and cant be enabled.</p>
 <p>You have to set the Happy Hour time values manually.</p>
-<p>If enabled it can randomly activate the Happy Hour. It will last for one hour, but can be turned off manually with the Shortkey.</p>
-<p>In the Config you can set a specific Date and Time. At that a Happy Hour will happen.</p>
+<p>Random Hour has a bell curve which can be edited in the config. It multiplies the normal time by a random amount for each sub.</p>
+<p>If enabled randHappy it can randomly activate the Happy Hour. It will last for one hour, but can be turned off manually with the Shortkey.</p>
+<p>In the Config you can set a specific Date and Time. At that a Happy Hour will happen. scheduleHappy needs to be turned on.</p>
 
 <h3>Bulk</h3>
 <p>This enables that multiple Subs get added to the timer at once.</p>
