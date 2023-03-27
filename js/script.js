@@ -6,23 +6,25 @@ var initialSeconds;
 var paused = false;
 var happy_hour_active = false;
 var random_hour_active = false;
+let countdownEnded = false;
+let countdownUpdater = null;
 
 var initialHoursLocal = window.localStorage.getItem('initialHours')
-if(initialHoursLocal !== null) {
+if (initialHoursLocal !== null) {
 	initialHours  = initialHoursLocal;
 	logMessage("Core", "Found initialHours in localStorage.")
 } else {
 	initialHours = initialHoursConfig;
 }
 var initialMinutesLocal = window.localStorage.getItem('initialMinutes')
-if(initialMinutesLocal !== null) {
+if (initialMinutesLocal !== null) {
 	initialMinutes = initialMinutesLocal;
 	logMessage("Core", "Found initialMinutes in localStorage.")
 } else {
 	initialMinutes = initialMinutesConfig;
 }
 var initialSecondsLocal = window.localStorage.getItem('initialSeconds')
-if(initialSecondsLocal !== null) {
+if (initialSecondsLocal !== null) {
 	initialSeconds  = initialSecondsLocal;
 	logMessage("Core", "Found initialSeconds in localStorage.")
 } else {
@@ -30,6 +32,10 @@ if(initialSecondsLocal !== null) {
 }
 
 resetBtn.addEventListener("click", function(){
+	
+	if (happy_hour_active) specialHourHandler('Happy');
+	if (random_hour_active) specialHourHandler('Random');
+	countdownEnded = false;
 	
 	initialHours = initialHoursConfig;
 	initialMinutes = initialMinutesConfig;
@@ -48,26 +54,25 @@ resetBtn.addEventListener("click", function(){
 	logMessage("Core", "Timer Reset.");
 });
 
-
 startBtn.addEventListener("click", function(){
 
-	if(paused){
+	if (paused){
 		var initialHoursLocal = window.localStorage.getItem('initialHours')
-		if(initialHoursLocal !== null) {
+		if (initialHoursLocal !== null) {
 			initialHours  = initialHoursLocal;
 			logMessage("Core", "Found initialHours in localStorage.")
 		} else {
 			initialHours = initialHoursConfig;
 		}
 		var initialMinutesLocal = window.localStorage.getItem('initialMinutes')
-		if(initialMinutesLocal !== null) {
+		if (initialMinutesLocal !== null) {
 			initialMinutes = initialMinutesLocal;
 			logMessage("Core", "Found initialMinutes in localStorage.")
 		} else {
 			initialMinutes = initialMinutesConfig;
 		}
 		var initialSecondsLocal = window.localStorage.getItem('initialSeconds')
-		if(initialSecondsLocal !== null) {
+		if (initialSecondsLocal !== null) {
 			initialSeconds  = initialSecondsLocal;
 			logMessage("Core", "Found initialSeconds in localStorage.")
 		} else {
@@ -86,14 +91,18 @@ startBtn.addEventListener("click", function(){
 
 	paused = false;
 	
+	countdownUpdater = setInterval(() => {
+	getNextTime();
+	}, 1); 
+	
 });
-
 
 Mousetrap.bind(pauseShort, function(e) {
 	paused = true;
 	logMessage("Core", "Timer was paused");
 	document.getElementById("startPage").style.visibility = "visible";
 	document.getElementById("container").style.visibility = "hidden";
+	clearInterval(countdownUpdater);
 });
 
 Mousetrap.bind(happyHourShort, async function(e){
@@ -105,7 +114,7 @@ Mousetrap.bind(randomHourShort, async function(e){
 });
 
 async function specialHourHandler(type){
-	if((type === 'Happy' && happy_hour) || (type === 'Random' && random_hour)){
+	if ((type === 'Happy' && happy_hour) || (type === 'Random' && random_hour)){
 		specialHourFunc(type)
 	}
 	else {
@@ -147,11 +156,8 @@ async function specialHourFunc(type){
 	document.getElementById("SpecialHourText").style.opacity = "0";
 }
 
-
-let countdownEnded = false;
 let users = [];
 let time;
-
 
 let endingTime = new Date(Date.now());
 endingTime = timeFunc.addHours(endingTime, initialHours);
@@ -176,17 +182,18 @@ const getNextTime = () => {
 		clearInterval(countdownUpdater);
 		countdownEnded = true;
 		time = "00:00:00";
+		logMessage("Core", "Timer Ended");
 	}
-	if(!paused){
+	if (!paused){
 		window.localStorage.setItem('initialHours', timeFunc.getHours(differenceTime));
 		window.localStorage.setItem('initialMinutes', timeFunc.getMinutes(differenceTime));
 		window.localStorage.setItem('initialSeconds', timeFunc.getSeconds(differenceTime));
 
-		if(randHappy && happy_hour && !randomHappyBool){
+		if (randHappy && happy_hour && !randomHappyBool){
 			randomHappyBool = true
 			setTimeout(randomHappy,1000)
 		}
-		if(scheduleHappy && happy_hour && !scheduleHappyBool){
+		if (scheduleHappy && happy_hour && !scheduleHappyBool){
 			scheduleHappyBool = true
 			scheduleHappyFunc()
 		}
@@ -195,13 +202,9 @@ const getNextTime = () => {
 	
 };
 
-let countdownUpdater = setInterval(() => {
-	getNextTime();
-}, 1); 
-
 function randomHappy(){
-	if(!happy_hour_active){
-		if((getRandomInt(0,10000) == 127)){
+	if (!happy_hour_active){
+		if ((getRandomInt(0,10000) == 127)){
 			logMessage("RandomHappy","It's not rigged!")
 			specialHourFunc()
 			setTimeout(specialHourFunc, 3600000)
@@ -212,9 +215,9 @@ function randomHappy(){
 
 function scheduleHappyFunc(){
 	let now = new Date()
-	if(now.getDay() == scheduleHappyDay){
-		if(now.getUTCHours() == scheduleHappyHour){
-			if(now.getUTCMinutes() == 00){
+	if (now.getDay() == scheduleHappyDay){
+		if (now.getUTCHours() == scheduleHappyHour){
+			if (now.getUTCMinutes() == 00){
 				logMessage("Schedule","It's time!")
 				specialHourFunc()
 				setTimeout(specialHourFunc, 3600000)
@@ -231,13 +234,13 @@ var timeoutID;
 
 const addTime = async (time, s) => {
     let addedTime = Math.floor(s);
-    if(!bulk_enabled) {
+    if (!bulk_enabled) {
         endingTimeBeforeCounter = time;
         addedTimeCounter = addedTime;
         addTimeInternal();
         return;
     }
-    if(firstSub) {
+    if (firstSub) {
         firstSub = false;
         endingTimeBeforeCounter = time;
         addedTimeCounter = addedTime;
@@ -255,12 +258,9 @@ const addTimeInternal = async () => {
     firstSub = true;
     
     let addedTime = document.createElement("p");
-	if(happy_hour_active) {
-		addedTime.classList = "gold";
-	}
-	else {
-		addedTime.classList = "addedTime";
-	}
+	
+	happy_hour_active ? addedTime.classList = "gold" : addedTime.classList = "addedTime";
+	
     addedTime.innerText = `+${s}s`;
     document.body.appendChild(addedTime);
     addedTime.style.display = "block";
@@ -268,7 +268,7 @@ const addTimeInternal = async () => {
     addedTime.style.left = `${randomInRange(35, 65)}%`;
     addedTime.style.top = `${randomInRange(15, 40)}%`;
     addedTime.style.opacity = "1";
-    while(s > 0){
+    while (s > 0){
         timeStep = s > 60 ? s/30 : 2
         endingTime = timeFunc.addSeconds(time, timeStep)
         await sleep(50);
