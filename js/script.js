@@ -179,10 +179,12 @@ const getNextTime = () => {
 	let differenceTime = endingTime - currentTime;
 	time = `${timeFunc.getHours(differenceTime)}:${timeFunc.getMinutes(differenceTime)}:${timeFunc.getSeconds(differenceTime)}`;
 	if (differenceTime <= 0) {
+		time = "00:00:00";
+		if (differenceTime <= (syncTime * 1000 * -1)) {
 		clearInterval(countdownUpdater);
 		countdownEnded = true;
-		time = "00:00:00";
 		logMessage("Core", "Timer Ended");
+		}
 	}
 	if (!paused){
 		window.localStorage.setItem('initialHours', timeFunc.getHours(differenceTime));

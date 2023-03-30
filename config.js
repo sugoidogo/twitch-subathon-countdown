@@ -27,6 +27,9 @@ var initialHoursConfig = 2
 var initialMinutesConfig = 0
 var initialSecondsConfig = 0
 
+// Sync Time, amount of seconds it waits after the timer hit 0 to stop it. Useful for last Second Subs.
+var syncTime = 2 // Default 2 seconds.
+
 // Enable/Disable Subs, Bits, Donations, Chests
 var subEnable = true
 var bitEnable = false
