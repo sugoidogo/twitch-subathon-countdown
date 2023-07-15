@@ -39,11 +39,11 @@ function handle_event(event_name,event_amount=1){
 
 function reset(){
 	localforage.removeItem('time_started')
-	localforage.removeItem('time_passed')
 	time_started=null
 	time_passed=null
 	time_total=parseReadableTimeIntoMilliseconds(config['start-time'])
 	localforage.setItem('time_total',time_total)
+	localforage.setItem('time_passed',0)
 }
 
 function load_config(){
