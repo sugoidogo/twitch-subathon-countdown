@@ -1,0 +1,128 @@
+<h1>Sugoi Streamathon Timer</h1>
+<div id="status">Loading...</div>
+<br>
+<form id="config">
+    <label>
+        Starting Time:
+        <input type="text" name="start-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="8:00:00" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="max-time-enabled">
+        Maximum Time:
+        <input type="text" name="max-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="12:00:00" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="sub1000-time-enabled">
+        Time Per T1 Sub:
+        <input type="text" name="sub1000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="500" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="sub2000-time-enabled">
+        Time Per T2 Sub:
+        <input type="text" name="sub2000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1000" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="sub3000-time-enabled">
+        Time Per T3 Sub:
+        <input type="text" name="sub3000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="2500" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="bit-time-enabled">
+        Time Per Bit:
+        <input type="text" name="bit-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="follow-time-enabled">
+        Time Per Follow:
+        <input type="text" name="follow-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1:00" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="raid-time-enabled">
+        Time Per Raid:
+        <input type="text" name="raid-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="10:00" required>
+    </label>
+    <br>
+    <label>
+        <input type="checkbox" name="charity-time-enabled">
+        Time Per Charity Cent:
+        <input type="text" name="charity-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1" required>
+    </label>
+    <br>
+    <button type="submit">Save</button>
+    <button type="reset">Defaults</button>
+    <a id="timer-link" href="index.html" target="_blank">Browser Source</a>
+    <div>
+        <h3>Chat Commands for Moderators:</h3>
+        !subathon start <br>
+        !subathon pause <br>
+        !subathon add 1:0:0 <br>
+        !subathon reset
+    </div>
+</form>
+<style>
+    * {
+        font-family: sans-serif;
+    }
+    ::placeholder {
+        color: lightgray;
+    }
+    fieldset {
+        border: none;
+        margin: 0;
+        padding: 0;
+    }
+    iframe {
+        overflow: hidden;
+    }
+</style>
+<script>
+    window.onload=async function(){
+        const client_id='ib2n7v7mur7ab2mcxv7rjju2ctsyoi'
+        const scope='moderator:read:followers channel:read:subscriptions bits:read channel:read:charity chat:read'
+        const status_div=document.querySelector('div#status')
+        status_div.innerHTML='Logging in to twitch...'
+        const TBA=await import('https://tba.sugoidogo.com/tba.mjs')
+        const tokens=await TBA.get_tokens(client_id,scope)
+        document.querySelector('#timer-link').href+='?refresh_token='+tokens.refresh_token
+        status_div.innerHTML='Loading settings...'
+        const FormDataDeep=await import('https://sugoidogo.github.io/js-util/FormDataDeep.mjs')
+        const config=await fetch('https://ts.sugoidogo.com/config.json',{headers:tokens.auth_headers})
+            .then(async response=>{
+                if(response.ok){
+                    return response.json()
+                }
+                console.warn(response.code,await response.text())
+                return {}
+            }
+        ).then(config=>{
+            for(const key in config){
+                const input=document.querySelector('[name='+key+']')
+                if(!input){
+                    continue
+                }
+                if(input.type=='checkbox'){
+                    input.checked=true
+                }else{
+                    input.value=config[key]
+                }
+            }
+        })
+        status_div.innerHTML='Ready!'
+        document.querySelector('form#config').onsubmit=function(event){
+            event.preventDefault()
+            const config=Object.fromEntries(new FormData(event.target))
+            fetch('https://ts.sugoidogo.com/config.json',{
+                headers:tokens.auth_headers,
+                method:'POST',
+                body:JSON.stringify(config)
+            })
+        }
+    }
+</script>
