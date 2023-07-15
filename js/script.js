@@ -81,11 +81,17 @@ function add_time(time){
 }
 
 function start(){
+	if(time_started){
+		return
+	}
 	time_started=Date.now()
 	localforage.setItem('time_started',time_started)
 }
 
 function pause(){
+	if(!time_started){
+		return
+	}
 	time_passed+=Date.now()-time_started
 	time_started=null
 	localforage.removeItem('time_started')
