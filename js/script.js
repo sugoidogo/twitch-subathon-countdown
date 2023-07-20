@@ -206,7 +206,7 @@ function init_pubsub(){
 				break
 			}
 			case 'MESSAGE':{
-				message=message.data.message
+				message=JSON.parse(message.data.message)
 				if('sub_plan' in message){
 					handle_event('sub'+message.sub_plan)
 					break
@@ -325,7 +325,7 @@ async function init_irc(){
 		ircSend('JOIN #'+tokens.login)
 	}
 	irc.onmessage=function(event){
-		console.log(event)
+		console.debug(event)
 		for(let data of event.data.split('\r\n')){
 			console.debug('> '+data)
 			/** @type string */
