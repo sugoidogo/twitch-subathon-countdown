@@ -4,55 +4,55 @@
 <form id="config">
     <label>
         Starting Time:
-        <input type="text" name="start-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="8:00:00" required>
+        <input type="text" name="start-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="8:00:00" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="max-time-enabled">
         Maximum Time:
-        <input type="text" name="max-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="12:00:00" required>
+        <input type="text" name="max-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="12:00:00" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="sub1000-time-enabled">
         Time Per T1 Sub:
-        <input type="text" name="sub1000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="500" required>
+        <input type="text" name="sub1000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="500" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="sub2000-time-enabled">
         Time Per T2 Sub:
-        <input type="text" name="sub2000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1000" required>
+        <input type="text" name="sub2000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1000" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="sub3000-time-enabled">
         Time Per T3 Sub:
-        <input type="text" name="sub3000-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="2500" required>
+        <input type="text" name="sub3000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="2500" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="bit-time-enabled">
         Time Per Bit:
-        <input type="text" name="bit-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1" required>
+        <input type="text" name="bit-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="follow-time-enabled">
         Time Per Follow:
-        <input type="text" name="follow-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1:00" required>
+        <input type="text" name="follow-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1:00" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="raid-time-enabled">
         Time Per Raid:
-        <input type="text" name="raid-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="10:00" required>
+        <input type="text" name="raid-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="10:00" required>
     </label>
     <br>
     <label>
         <input type="checkbox" name="charity-time-enabled">
         Time Per Charity Cent:
-        <input type="text" name="charity-time" pattern="[\d:]+" placeholder="HH:MM:SS" value="1" required>
+        <input type="text" name="charity-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1" required>
     </label>
     <br>
     <button type="submit">Save</button>
@@ -96,7 +96,11 @@
         const config=await fetch('https://ts.sugoidogo.com/config.json',{headers:tokens.auth_headers})
             .then(async response=>{
                 if(response.ok){
-                    return response.json()
+                    try {
+                        return await response.json()
+                    } catch {
+                        return {}
+                    }
                 }
                 console.warn(response.code,await response.text())
                 return {}
