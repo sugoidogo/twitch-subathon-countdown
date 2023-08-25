@@ -11,11 +11,17 @@ A subathon timer that increases when someone subscribes, donates to your charity
 ## Usage
 Go to the [config page](https://sugoidogo.github.io/twitch-subathon-countdown/config.html), authorize the timer, and configure to your liking.
 
+### StreamElements Tips
+You will need your StreamElements Overlay Token to use this feature.
+You can get if from your [StreamElements channel settings](https://streamelements.com/dashboard/account/channels).
+
+![StreamElements Overlay Token Image](auth_streamelements.png)
+
 ## Support
 See [my github profile](https://github.com/sugoidogo)
 
 ## Missing Features
-The original version of this overlay included support for events from StreamElements, StreamLabs, and Streamloots,
+The original version of this overlay included support for events from StreamLabs and Streamloots,
 and the version this is forked from included additional features by leabdd and danilotitato,
 such as Random Happy Hour and Bulk Events.
 This fork is an almost total re-write of the core JS code behind the timer,
