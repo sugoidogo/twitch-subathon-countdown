@@ -1,7 +1,7 @@
 const client_id='ib2n7v7mur7ab2mcxv7rjju2ctsyoi'
 const message_ids=[]
 const timer=document.querySelector('#timeText')
-let tba,tokens,pubsub,ping_tid,pong_tid,eventsub,sse,time_started,time_passed,time_total,config,localforage
+let tba,tokens,pubsub,ping_tid,pong_tid,eventsub,sse,time_started,time_passed,time_total,config,localforage,streamelements
 /** @type WebSocket */
 let irc
 
@@ -22,11 +22,14 @@ window.onload=async function(){
 	tba=await import('https://tba.sugoidogo.com/tba.mjs')
 	tokens=await tba.get_tokens(client_id)
 	// load user config
-	load_config()
+	await load_config()
 	// init event sources
 	init_irc()
 	init_pubsub()
 	init_eventsub()
+	if('streamelements-token' in config){
+		init_streamelements()
+	}
 }
 
 function handle_event(event_name,event_amount=1){
@@ -365,4 +368,25 @@ async function init_irc(){
 			}
 		}
 	}
+}
+
+function init_streamelements(){
+	streamelements=io('https://realtime.streamelements.com',{transports: ['websocket']})
+	streamelements.on('disconnect',init_streamelements)
+	streamelements.on('connect',()=>streamelements.emit('authenticate', {method: 'apikey', token: config['streamelements-token']}))
+	streamelements.on('authenticated', console.debug);
+    streamelements.on('unauthorized', console.error);
+	
+	function onEvent(event){
+		console.debug(event)
+		if(event['name'] !== "tip-latest"){
+			return false
+		}
+		handle_event('tip',event['data']['amount']*100)
+	}
+
+	streamelements.on('event:test', onEvent);
+	streamelements.on('event', onEvent);
+	streamelements.on('event:update', onEvent);
+	streamelements.on('event:reset', onEvent);
 }
