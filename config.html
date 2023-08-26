@@ -8,49 +8,49 @@
     </label>
     <br>
     <label>
-        <input type="checkbox" name="max-time-enabled">
+        <input type="checkbox" name="max-time-enabled" checked>
         Maximum Time:
         <input type="text" name="max-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="12:00:00" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="sub1000-time-enabled">
+        <input type="checkbox" name="sub1000-time-enabled" checked>
         Time Per T1 Sub:
         <input type="text" name="sub1000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="500" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="sub2000-time-enabled">
+        <input type="checkbox" name="sub2000-time-enabled" checked>
         Time Per T2 Sub:
         <input type="text" name="sub2000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1000" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="sub3000-time-enabled">
+        <input type="checkbox" name="sub3000-time-enabled" checked>
         Time Per T3 Sub:
         <input type="text" name="sub3000-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="2500" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="bit-time-enabled">
+        <input type="checkbox" name="bit-time-enabled" checked>
         Time Per Bit:
         <input type="text" name="bit-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="follow-time-enabled">
+        <input type="checkbox" name="follow-time-enabled" checked>
         Time Per Follow:
         <input type="text" name="follow-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1:00" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="raid-time-enabled">
+        <input type="checkbox" name="raid-time-enabled" checked>
         Time Per Raid:
         <input type="text" name="raid-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="10:00" required>
     </label>
     <br>
     <label>
-        <input type="checkbox" name="charity-time-enabled">
+        <input type="checkbox" name="charity-time-enabled" checked>
         Time Per Charity Cent:
         <input type="text" name="charity-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1" required>
     </label>
@@ -62,7 +62,7 @@
     </label>
     <br>
     <label>
-        <input type="checkbox" name="tip-time-enabled">
+        <input type="checkbox" name="tip-time-enabled" checked>
         Time Per Tip Cent:
         <input type="text" name="tip-time" pattern="[\d.\d:]+" placeholder="HH:MM:SS" value="1">
     </label>
@@ -119,6 +119,9 @@
                 return {}
             }
         ).then(config=>{
+            for(const checkbox of document.querySelectorAll('input[type=checkbox]')){
+                checkbox.checked=false
+            }
             for(const key in config){
                 const input=document.querySelector('[name='+key+']')
                 if(!input){
