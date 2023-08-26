@@ -209,13 +209,14 @@ function init_pubsub(){
 				break
 			}
 			case 'MESSAGE':{
-				message=JSON.parse(message.data.message)
+				message=JSON.parse(message.data.message).data
+				console.debug(message)
 				if('sub_plan' in message){
 					handle_event('sub'+message.sub_plan)
 					break
 				}
 				if('bits_used' in message){
-					handle_bits('bit',message.bits_used)
+					handle_event('bit',message.bits_used)
 					break
 				}
 			}
