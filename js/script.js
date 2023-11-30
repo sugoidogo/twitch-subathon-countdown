@@ -211,8 +211,8 @@ function init_pubsub(){
 			case 'MESSAGE':{
 				message=JSON.parse(message.data.message).data
 				console.debug(message)
-				if('sub_trier' in message){
-					handle_event('sub'+message.sub_trier)
+				if('sub_tier' in message){
+					handle_event('sub'+message.sub_tier)
 					break
 				}
 				if('bits_used' in message){
