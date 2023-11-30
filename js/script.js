@@ -209,7 +209,7 @@ function init_pubsub(){
 				break
 			}
 			case 'MESSAGE':{
-				message=JSON.parse(message.data.message).data
+				message=JSON.parse(message.data.message)
 				console.debug(message)
 				if('sub_tier' in message){
 					handle_event('sub'+message.sub_tier)
