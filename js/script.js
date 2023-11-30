@@ -329,6 +329,7 @@ async function init_irc(){
 		ircSend('PASS oauth:'+tokens.access_token)
 		ircSend('NICK '+tokens.login)
 		ircSend('JOIN #'+tokens.login)
+		ircSend('PRIVMSG #'+tokens.login+' :SugoiSubathon connected')
 	}
 	irc.onmessage=function(event){
 		console.debug(event)
