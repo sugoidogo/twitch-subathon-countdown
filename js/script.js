@@ -318,6 +318,7 @@ function ircSend(message){
 
 async function init_irc(){
 	if(irc){
+		irc.onclose=null
 		irc.close()
 	}
 	irc=new WebSocket('wss://irc-ws.chat.twitch.tv:443')
