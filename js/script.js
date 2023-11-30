@@ -322,6 +322,7 @@ async function init_irc(){
 	}
 	irc=new WebSocket('wss://irc-ws.chat.twitch.tv:443')
 	irc.onclose=init_irc
+	irc.onerror=init_irc
 	irc.onopen=function(){
 		ircSend('CAP REQ twitch.tv/tags')
 		ircSend('PASS oauth:'+tokens.access_token)
