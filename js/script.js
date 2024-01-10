@@ -61,6 +61,9 @@ function load_config(){
 }
 
 function add_time(time){
+	if(isNaN(time)){
+		throw time+" is not a number"
+	}
 	if(config['max-time-enabled']){
 		const new_time=time_total+time
 		const max_time=parseReadableTimeIntoMilliseconds(config['max-time'])
@@ -215,6 +218,8 @@ function init_pubsub(){
 					handle_event('sub'+message.sub_plan)
 					break
 				}
+				message=message.data
+				console.debug(message)
 				if('bits_used' in message){
 					handle_event('bit',message.bits_used)
 					break
