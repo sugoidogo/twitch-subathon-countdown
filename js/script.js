@@ -1,3 +1,23 @@
+import('https://cdn.jsdelivr.net/npm/@sentry/browser@8/+esm').then(sentry=>{
+	sentry.init({
+		dsn:'https://f5fe0dec9f2f42dc80153b67e7e00dd0@app.glitchtip.com/8359'
+	})
+}).catch(e=>{
+	console.warn('automatic error reporting failed to load',e)
+})
+
+try{
+	if(window.location.search.includes('remotejs')){
+		const channel=new URLSearchParams(window.location.search).get('remotejs')
+		const script=document.createElement('script')
+		script.src='https://remotejs.com/agent/agent.js'
+		script.setAttribute("data-consolejs-channel",channel)
+		document.head.appendChild(script)
+	}
+}catch(e){
+	console.warn('remotejs load failed',e)
+}
+
 const client_id='ib2n7v7mur7ab2mcxv7rjju2ctsyoi'
 const message_ids=[]
 const timer=document.querySelector('#timeText')
