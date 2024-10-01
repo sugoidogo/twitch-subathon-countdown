@@ -1,6 +1,7 @@
 import('https://cdn.jsdelivr.net/npm/@sentry/browser@8/+esm').then(sentry=>{
 	sentry.init({
-		dsn:'https://f5fe0dec9f2f42dc80153b67e7e00dd0@app.glitchtip.com/8359'
+		dsn:'https://f5fe0dec9f2f42dc80153b67e7e00dd0@app.glitchtip.com/8359',
+		environment:location.hostname,
 	})
 }).catch(e=>{
 	console.warn('automatic error reporting failed to load',e)
