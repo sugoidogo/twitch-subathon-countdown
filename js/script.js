@@ -1,27 +1,20 @@
-import('https://cdn.jsdelivr.net/npm/@sentry/browser@8/+esm').then(sentry=>{
-	sentry.init({
-		dsn:'https://f5fe0dec9f2f42dc80153b67e7e00dd0@app.glitchtip.com/8359',
-		environment:location.hostname,
-		release:"1.1.0"
-	})
-}).catch(e=>{
-	console.warn('automatic error reporting failed to load',e)
-})
+import AuthProvider from 'https://ebs.sugoidogo.com/SugoiAuthProvider.mjs'
+import WebStorage from 'https://ebs.sugoidogo.com/WebStorage.mjs'
+import { ApiClient } from 'https://cdn.jsdelivr.net/npm/@twurple/api@7/+esm'
+import { EventSubWsListener } from 'https://cdn.jsdelivr.net/npm/@twurple/eventsub-ws@7/+esm'
 
-try{
-	if(window.location.search.includes('remotejs')){
-		const channel=new URLSearchParams(window.location.search).get('remotejs')
-		const script=document.createElement('script')
-		script.src='https://remotejs.com/agent/agent.js'
-		script.setAttribute("data-consolejs-channel",channel)
-		document.head.appendChild(script)
-	}
-}catch(e){
-	console.warn('remotejs load failed',e)
-}
+const client_id = 'ib2n7v7mur7ab2mcxv7rjju2ctsyoi'
 
-const client_id='ib2n7v7mur7ab2mcxv7rjju2ctsyoi'
-const message_ids=[]
+/** @type {import('../node_modules/twitch-cloud-ebs/static/SugoiAuthProvider.mjs').default} */
+const authProvider = new AuthProvider(client_id)
+/** @type {import('../node_modules/twitch-cloud-ebs/static/WebStorage.mjs').default} */
+const webStorage = new WebStorage(authProvider)
+/** @type {import('@twurple/api').ApiClient} */
+const apiClient = new ApiClient({ authProvider })
+/** @type {import('@twurple/eventsub-ws').EventSubWsListener} */
+const eventSub = new EventSubWsListener({ apiClient })
+
+const message_ids = []
 const timer=document.querySelector('#timeText')
 let tba,tokens,pubsub,ping_tid,pong_tid,eventsub,sse,time_started,time_passed,time_total,config,localforage,streamelements
 /** @type WebSocket */
@@ -31,31 +24,9 @@ window.onanimationend=function(event){
 	event.target.remove()
 }
 
-window.onload=async function(){
-	// init localforage
-	localforage=(await import('https://cdn.jsdelivr.net/npm/localforage/+esm')).default
-	localforage=localforage.createInstance({name:'sugoi-subathon-countdown'})
-	// init timer display
-	time_started=await localforage.getItem('time_started')
-	time_passed=await localforage.getItem('time_passed')
-	time_total=await localforage.getItem('time_total')
-	updateTime()
-	// init twitch api tokens
-	tba=await import('https://tba.sugoidogo.com/tba.mjs')
-	tokens=await tba.get_tokens(client_id)
-	// load user config
-	await load_config()
-	// init event sources
-	init_irc()
-	init_pubsub()
-	init_eventsub()
-	if('streamelements-token' in config){
-		init_streamelements()
-	}
-}
-
-function handle_event(event_name,event_amount=1){
-	if(!config[event_name+'-time-enabled']){
+function handle_event(event_name, event_amount = 1) {
+	console.debug(event_name,event_amount)
+	if (!config[event_name + '-time-enabled']) {
 		return false
 	}
 	add_time(parseReadableTimeIntoMilliseconds(config[event_name+'-time'])*event_amount)
@@ -72,7 +43,7 @@ function reset(){
 }
 
 function load_config(){
-	return fetch('https://ts.sugoidogo.com/config.json',{headers:tokens.auth_headers})
+	return webStorage.fetch('config.json',{headers:tokens.auth_headers})
 	.then(response=>response.json())
 	.then(json=>{
 		config=json
@@ -184,71 +155,9 @@ function updateTime(){
 	requestAnimationFrame(updateTime)
 }
 
-function init_pubsub(){
-	if(pong_tid){
-		clearTimeout(pong_tid)
-		pong_tid=null
-	}
-	if(ping_tid){
-		clearTimeout(ping_tid)
-		ping_tid=null
-	}
-	if(pubsub){
-		pubsub.close()
-	}
-	pubsub=new WebSocket('wss://pubsub-edge.twitch.tv')
-	pubsub.onopen=function(){
-		pubsub.send(JSON.stringify({
-			"type":"LISTEN",
-			"data":{
-				"auth_token":tokens.access_token,
-				"topics":[
-					"channel-bits-events-v2."+tokens.user_id,
-					"channel-subscribe-events-v1."+tokens.user_id
-				]
-			}
-		}))
-	}
-	pubsub.onmessage=function(event){
-		let message=JSON.parse(event.data)
-		console.debug(message)
-		switch(message.type){
-			case 'RESPONSE':{
-				if(message.error){
-					throw message.error
-				}
-				pubsub_ping()
-				break
-			}
-			case 'PONG':{
-				clearTimeout(pong_tid)
-				pong_tid=null
-				break
-			}
-			case 'RECONNECT':{
-				init_pubsub()
-				break
-			}
-			case 'AUTH_REVOKED':{
-				location.reload()
-				break
-			}
-			case 'MESSAGE':{
-				message=JSON.parse(message.data.message)
-				console.debug(message)
-				if('sub_plan' in message){
-					handle_event('sub'+message.sub_plan)
-					break
-				}
-				message=message.data
-				console.debug(message)
-				if('bits_used' in message){
-					handle_event('bit',message.bits_used)
-					break
-				}
-			}
-		}
-	}
+function init_pubsub() {
+	eventSub.onChannelSubscription(tokens.user_id, event => handle_event('sub' + event.tier))
+	eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit ', event.bits))
 }
 
 function pubsub_ping(){
@@ -258,84 +167,10 @@ function pubsub_ping(){
 	pong_tid=setTimeout(init_pubsub,20000)
 }
 
-function init_eventsub(){
-	eventsub=new WebSocket('wss://eventsub.wss.twitch.tv/ws')
-	eventsub.onmessage=function(event){
-		let message=JSON.parse(event.data)
-		console.debug(message)
-		if(message.metadata.message_id in message_ids){
-			return
-		}else{
-			message_ids.push(message.metadata.message_id)
-		}
-		switch(message.metadata.message_type){
-			case 'session_welcome':{
-				let session_id=message.payload.session.id
-				const headers={'content-type':'application/json'}
-				Object.assign(headers,tokens.auth_headers)
-				const url=new URL('https://api.twitch.tv/helix/eventsub/subscriptions')
-				subscriptions=[
-					{
-						"type": "channel.follow",
-						"version": "2",
-						"condition": {
-							"broadcaster_user_id": tokens.user_id,
-							"moderator_user_id": tokens.user_id
-						},
-						"transport": {
-							"method": "websocket",
-							"session_id": session_id,
-						}
-					},
-					{
-						"type": "channel.raid",
-						"version": "1",
-						"condition": {
-							"to_broadcaster_user_id": tokens.user_id
-						},
-						"transport": {
-							"method": "websocket",
-							"session_id": session_id,
-						}
-					},
-					{
-						"type": "channel.charity_campaign.donate",
-						"version": "1",
-						"condition": {
-							"broadcaster_user_id": tokens.user_id
-						},
-						"transport": {
-							"method": "websocket",
-							"session_id": session_id,
-						}
-					}
-				]
-				for(const subscription of subscriptions){
-					fetch(url,{
-						headers:headers,
-						method:"POST",
-						body:JSON.stringify(subscription)
-					})
-				}
-				break
-			}
-			case 'notification':{
-				switch(message.metadata.subscription_type){
-					case 'channel.follow':{
-						handle_event('follow')
-						break
-					}
-					case 'channel.raid':{
-						handle_event('raid')
-						break
-					}
-					case 'channel.charity_campaign.donate':{
-						handle_event('charity',message.event.amount.value)
-					}
-				}
-			}
-		}
-	}
+function init_eventsub() {
+	eventSub.onChannelFollow(tokens.user_id, tokens.user_id, event => handle_event('follow'))
+	eventSub.onChannelRaidFrom(tokens.user_id, event => handle_event('raid'))
+	eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity', event.amount.value))
 }
 
 function ircSend(message){
@@ -343,62 +178,32 @@ function ircSend(message){
 	irc.send(message)
 }
 
-async function init_irc(){
-	if(irc){
-		irc.onclose=null
-		irc.close()
-	}
-	irc=new WebSocket('wss://irc-ws.chat.twitch.tv:443')
-	irc.onclose=init_irc
-	irc.onerror=init_irc
-	irc.onopen=function(){
-		ircSend('CAP REQ twitch.tv/tags')
-		ircSend('PASS oauth:'+tokens.access_token)
-		ircSend('NICK '+tokens.login)
-		ircSend('JOIN #'+tokens.login)
-		//ircSend('PRIVMSG #'+tokens.login+' :SugoiSubathon connected')
-	}
-	irc.onmessage=function(event){
-		console.debug(event)
-		for(let data of event.data.split('\r\n')){
-			console.debug('> '+data)
-			/** @type string */
-			data=data.split(':')
-			const tags=data.shift()
-			const type=data.shift()
-			const message=data.join(':')
-			console.debug(tags,type,message)
-			if(!message){
-				continue
+async function init_irc() {
+	eventSub.onChannelChatMessage(tokens.user_id, tokens.user_id, event => {
+		console.debug('> ' + event.messageText)
+		const command = event.messageText.split(' ')
+		if ((command.shift()!='!subathon') || event.chatterId !== tokens.user_id && (!mods.includes(event.chatterId))) {
+			return
+		}
+		switch(command.shift()){
+			case 'start':{
+				start()
+				break
 			}
-			if(!(tags.includes('broadcaster') || tags.includes('moderator'))){
-				continue
+			case 'pause':{
+				pause()
+				break
 			}
-			const command=message.split(' ')
-			console.debug(command)
-			if(command.shift()!='!subathon'){
-				continue
+			case 'reset':{
+				reset()
+				break
 			}
-			switch(command.shift()){
-				case 'start':{
-					start()
-					break
-				}
-				case 'pause':{
-					pause()
-					break
-				}
-				case 'reset':{
-					reset()
-					break
-				}
-				case 'add':{
-					add_time(parseReadableTimeIntoMilliseconds(command.shift()))
-					break
-				}
+			case 'add':{
+				add_time(parseReadableTimeIntoMilliseconds(command.shift()))
+				break
 			}
 		}
-	}
+	})
 }
 
 function init_streamelements(){
@@ -421,3 +226,34 @@ function init_streamelements(){
 	streamelements.on('event:update', onEvent);
 	streamelements.on('event:reset', onEvent);
 }
+
+// init localforage
+localforage = (await import('https://cdn.jsdelivr.net/npm/localforage/+esm')).default
+localforage = localforage.createInstance({ name: 'sugoi-subathon-countdown' })
+// init timer display
+time_started = await localforage.getItem('time_started')
+time_passed = await localforage.getItem('time_passed')
+time_total = await localforage.getItem('time_total')
+updateTime()
+// migrate to WebStorage
+if(time_started){
+	
+}
+// init twitch api tokens
+tokens = await authProvider.getAccessTokenForUser(null)
+await apiClient.getTokenInfo().then(info => tokens.user_id = info.userId)
+// load user config
+await load_config()
+// create real time mod list
+const mods = await apiClient.moderation.getModeratorsPaginated(tokens.user_id).getAll()
+eventSub.onChannelModeratorAdd(tokens.user_id, event => mods.push(event.userId))
+eventSub.onChannelModeratorRemove(tokens.user_id, event => mods.slice(mods.indexOf(event.userId), 1))
+// init event sources
+init_irc()
+init_pubsub()
+init_eventsub()
+if ('streamelements-token' in config) {
+	init_streamelements()
+}
+eventSub.start()
+console.debug('load complete')
