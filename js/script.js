@@ -14,11 +14,8 @@ const apiClient = new ApiClient({ authProvider })
 /** @type {import('@twurple/eventsub-ws').EventSubWsListener} */
 const eventSub = new EventSubWsListener({ apiClient })
 
-const message_ids = []
 const timer=document.querySelector('#timeText')
-let tba,tokens,pubsub,ping_tid,pong_tid,eventsub,sse,time_started,time_passed,time_total,config,localforage,streamelements
-/** @type WebSocket */
-let irc
+let tokens,time_started,time_passed,time_total,config,localforage,streamelements
 
 window.onanimationend=function(event){
 	event.target.remove()
@@ -40,17 +37,6 @@ function reset(){
 	time_total=parseReadableTimeIntoMilliseconds(config['start-time'])
 	localforage.setItem('time_total',time_total)
 	localforage.setItem('time_passed',0)
-}
-
-function load_config(){
-	return webStorage.fetch('config.json',{headers:tokens.auth_headers})
-	.then(response=>response.json())
-	.then(json=>{
-		config=json
-		if(!time_started && !time_passed){
-			reset()
-		}
-	})
 }
 
 function add_time(time){
@@ -155,45 +141,6 @@ function updateTime(){
 	requestAnimationFrame(updateTime)
 }
 
-function init_pubsub() {
-	eventSub.onChannelSubscription(tokens.user_id, event => handle_event('sub' + event.tier))
-	eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit ', event.bits))
-}
-
-function init_eventsub() {
-	eventSub.onChannelFollow(tokens.user_id, tokens.user_id, event => handle_event('follow'))
-	eventSub.onChannelRaidFrom(tokens.user_id, event => handle_event('raid'))
-	eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity', event.amount.value))
-}
-
-async function init_irc() {
-	eventSub.onChannelChatMessage(tokens.user_id, tokens.user_id, event => {
-		console.debug('> ' + event.messageText)
-		const command = event.messageText.split(' ')
-		if ((command.shift()!='!subathon') || event.chatterId !== tokens.user_id && (!mods.includes(event.chatterId))) {
-			return
-		}
-		switch(command.shift()){
-			case 'start':{
-				start()
-				break
-			}
-			case 'pause':{
-				pause()
-				break
-			}
-			case 'reset':{
-				reset()
-				break
-			}
-			case 'add':{
-				add_time(parseReadableTimeIntoMilliseconds(command.shift()))
-				break
-			}
-		}
-	})
-}
-
 function init_streamelements(){
 	streamelements=io('https://realtime.streamelements.com',{transports: ['websocket']})
 	streamelements.on('disconnect',init_streamelements)
@@ -223,25 +170,57 @@ time_started = await localforage.getItem('time_started')
 time_passed = await localforage.getItem('time_passed')
 time_total = await localforage.getItem('time_total')
 updateTime()
-// migrate to WebStorage
-if(time_started){
-	
-}
 // init twitch api tokens
 tokens = await authProvider.getAccessTokenForUser(null)
 await apiClient.getTokenInfo().then(info => tokens.user_id = info.userId)
 // load user config
-await load_config()
+await webStorage.fetch('config.json',{headers:tokens.auth_headers})
+.then(response=>response.json())
+.then(json=>{
+	config=json
+	if(!time_started && !time_passed){
+		reset()
+	}
+})
 // create real time mod list
 const mods = await apiClient.moderation.getModeratorsPaginated(tokens.user_id).getAll()
 eventSub.onChannelModeratorAdd(tokens.user_id, event => mods.push(event.userId))
 eventSub.onChannelModeratorRemove(tokens.user_id, event => mods.slice(mods.indexOf(event.userId), 1))
 // init event sources
-init_irc()
-init_pubsub()
-init_eventsub()
+eventSub.onChannelSubscription(tokens.user_id, event => handle_event('sub' + event.tier))
+eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit ', event.bits))
+eventSub.onChannelFollow(tokens.user_id, tokens.user_id, event => handle_event('follow'))
+eventSub.onChannelRaidFrom(tokens.user_id, event => handle_event('raid'))
+eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity', event.amount.value))
+eventSub.onChannelChatMessage(tokens.user_id, tokens.user_id, event => {
+	console.debug('> ' + event.messageText)
+	const command = event.messageText.split(' ')
+	if ((command.shift()!='!subathon') || event.chatterId !== tokens.user_id && (!mods.includes(event.chatterId))) {
+		return
+	}
+	switch(command.shift()){
+		case 'start':{
+			start()
+			break
+		}
+		case 'pause':{
+			pause()
+			break
+		}
+		case 'reset':{
+			reset()
+			break
+		}
+		case 'add':{
+			add_time(parseReadableTimeIntoMilliseconds(command.shift()))
+			break
+		}
+	}
+})
+eventSub.start()
+
 if ('streamelements-token' in config) {
 	init_streamelements()
 }
-eventSub.start()
+
 console.debug('load complete')
