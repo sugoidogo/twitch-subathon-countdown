@@ -219,7 +219,7 @@ eventSub.onChannelChatMessage(tokens.user_id, tokens.user_id, event => {
 })
 eventSub.start()
 
-if ('streamelements-token' in config) {
+if ('streamelements-token' in config && config['streamelements-token']) {
 	init_streamelements()
 }
 
