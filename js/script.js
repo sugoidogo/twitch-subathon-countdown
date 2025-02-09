@@ -160,22 +160,10 @@ function init_pubsub() {
 	eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit ', event.bits))
 }
 
-function pubsub_ping(){
-	pubsub.send(JSON.stringify({'type':'PING'}))
-	const time=Math.floor(Math.random() * (5*60*1000))
-	ping_tid=setTimeout(pubsub_ping,time)
-	pong_tid=setTimeout(init_pubsub,20000)
-}
-
 function init_eventsub() {
 	eventSub.onChannelFollow(tokens.user_id, tokens.user_id, event => handle_event('follow'))
 	eventSub.onChannelRaidFrom(tokens.user_id, event => handle_event('raid'))
 	eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity', event.amount.value))
-}
-
-function ircSend(message){
-	console.debug('< '+message)
-	irc.send(message)
 }
 
 async function init_irc() {
