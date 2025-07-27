@@ -183,7 +183,13 @@ await webStorage.fetch('config.json',{headers:tokens.auth_headers})
 	}
 })
 // create real time mod list
-const mods = await apiClient.moderation.getModeratorsPaginated(tokens.user_id).getAll()
+const mods = await apiClient.moderation.getModeratorsPaginated(tokens.user_id).getAll().then(helix_mods=>{
+	const local_mods=[]
+	for (const helix_mod of helix_mods) {
+		local_mods.push(helix_mod.userId)
+	}
+	return local_mods
+})
 eventSub.onChannelModeratorAdd(tokens.user_id, event => mods.push(event.userId))
 eventSub.onChannelModeratorRemove(tokens.user_id, event => mods.slice(mods.indexOf(event.userId), 1))
 // init event sources
@@ -195,7 +201,7 @@ eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity
 eventSub.onChannelChatMessage(tokens.user_id, tokens.user_id, event => {
 	console.debug('> ' + event.messageText)
 	const command = event.messageText.split(' ')
-	if ((command.shift()!='!subathon') || event.chatterId !== tokens.user_id && (!mods.includes(event.chatterId))) {
+	if ((command.shift()!='!subathon') || (event.chatterId !== tokens.user_id && (!mods.includes(event.chatterId)))) {
 		return
 	}
 	switch(command.shift()){
