@@ -194,7 +194,7 @@ eventSub.onChannelModeratorAdd(tokens.user_id, event => mods.push(event.userId))
 eventSub.onChannelModeratorRemove(tokens.user_id, event => mods.slice(mods.indexOf(event.userId), 1))
 // init event sources
 eventSub.onChannelSubscription(tokens.user_id, event => handle_event('sub' + event.tier))
-eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit ', event.bits))
+eventSub.onChannelCheer(tokens.user_id, event => handle_event('bit', event.bits))
 eventSub.onChannelFollow(tokens.user_id, tokens.user_id, event => handle_event('follow'))
 eventSub.onChannelRaidFrom(tokens.user_id, event => handle_event('raid'))
 eventSub.onChannelCharityDonation(tokens.user_id, event => handle_event('charity', event.amount.value))
