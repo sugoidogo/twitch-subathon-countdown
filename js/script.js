@@ -1,4 +1,11 @@
-import AuthProvider from 'https://ebs.sugoidogo.com/SugoiAuthProvider.mjs'
+{
+	const url = new URL(location)
+	url.hostname = 'subathon.sugoidogo.com'
+	url.pathname = '/timer'
+	location.assign(url)
+}
+
+import Authrovider from 'https://ebs.sugoidogo.com/SugoiAuthProvider.mjs'
 import WebStorage from 'https://ebs.sugoidogo.com/WebStorage.mjs'
 import { ApiClient } from 'https://cdn.jsdelivr.net/npm/@twurple/api@7/+esm'
 import { EventSubWsListener } from 'https://cdn.jsdelivr.net/npm/@twurple/eventsub-ws@7/+esm'

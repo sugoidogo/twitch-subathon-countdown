@@ -1,3 +1,10 @@
+{
+    const url = new URL(location)
+    url.hostname = 'subathon.sugoidogo.com'
+    url.pathname = '/'
+    location.assign(url)
+}
+
 const status_div = document.querySelector('div#status')
 onerror = function (error) {
     status_div.innerHTML = error.message
